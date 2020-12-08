@@ -1,0 +1,106 @@
+// Place your settings in this file to overwrite the default settings
+{
+  "editor.tabSize": 2,
+  "files.trimTrailingWhitespace": true,
+  "editor.rulers": [
+    80
+  ],
+  "clang-format.fallbackStyle": "google",
+  "clang-format.language.typescript.enable": true,
+  "clang-format.language.javascript.enable": false,
+  "clang-format.executable": "clang-format",
+  "files.autoSave": "afterDelay",
+  "explorer.openEditors.visible": 0,
+  "editor.wordWrap": "wordWrapColumn",
+  "html.suggest.html5": false,
+  "files.insertFinalNewline": true,
+  "workbench.activityBar.visible": true,
+  "window.zoomLevel": 0,
+  "workbench.iconTheme": "vs-seti",
+  "typescript.referencesCodeLens.enabled": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "editor.minimap.enabled": false,
+  "[markdown]": {
+    "editor.wordWrap": "bounded",
+    "editor.quickSuggestions": false
+  },
+  "[idris]": {
+    "editor.formatOnPaste": false
+  },
+  "[rust]": {
+    "editor.rulers": [],
+    "editor.wordWrap": "off"
+  },
+  "[starlark]": {
+    "editor.rulers": [],
+    "editor.wordWrap": "off"
+  },
+  "editor.renderIndentGuides": false,
+  "search.quickOpen.includeSymbols": true,
+  "editor.formatOnPaste": true,
+  "css.validate": false,
+  "workbench.statusBar.visible": true,
+  "git.autofetch": true,
+  "terminal.integrated.scrollback": 20000,
+  "editor.tokenColorCustomizations": {},
+  "workbench.colorCustomizations": {
+    "editorWarning.foreground": "#FFA500"
+  },
+  "html.autoClosingTags": false,
+  "html.format.wrapLineLength": 79,
+  "editor.suggestSelection": "first",
+  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+  "diffEditor.ignoreTrimWhitespace": true,
+  "editor.find.seedSearchStringFromSelection": false,
+  // "[typescript]": {
+  //   "editor.defaultFormatter": "esbenp.prettier-vscode"
+  // },
+  "workbench.startupEditor": "welcomePage",
+  "diffEditor.renderSideBySide": true,
+  "files.hotExit": "onExitAndWindowClose",
+
+  "lit-plugin.strict": true,
+  "lit-plugin.rules.no-unknown-tag-name": "error",
+  "lit-plugin.rules.no-unclosed-tag": "error",
+  "lit-plugin.rules.no-unknown-property": "error",
+  "lit-plugin.rules.no-unintended-mixed-binding": "error",
+  "lit-plugin.rules.no-invalid-boolean-binding": "error",
+  "lit-plugin.rules.no-expressionless-property-binding": "error",
+  "lit-plugin.rules.no-noncallable-event-binding": "error",
+  "lit-plugin.rules.no-boolean-in-attribute-binding": "error",
+  "lit-plugin.rules.no-complex-attribute-binding": "error",
+  "lit-plugin.rules.no-nullable-attribute-binding": "error",
+  "lit-plugin.rules.no-incompatible-type-binding": "error",
+  "lit-plugin.rules.no-invalid-directive-binding": "error",
+  "lit-plugin.rules.no-incompatible-property-type": "error",
+  "lit-plugin.rules.no-unknown-property-converter": "error",
+  "lit-plugin.rules.no-invalid-attribute-name": "error",
+  "lit-plugin.rules.no-invalid-tag-name": "error",
+  // Does not yet handle re-exports, so not compatible with importing
+  // Polymer elements.
+  // TODO(rictic): fix the re-export issue and enable this pass.
+  "lit-plugin.rules.no-missing-import": "off",
+  // Attributes are an open set. Too many false positives.
+  "lit-plugin.rules.no-unknown-attribute": "off",
+  // Events are not widely declared at the moment. Worth investigating.
+  "lit-plugin.rules.no-unknown-event": "off",
+  // Slots are not widely declared at the moment. Worth investigating.
+  "lit-plugin.rules.no-unknown-slot": "off",
+  // Does not handle CSS interpolation, or writing with CSS snippets
+  "lit-plugin.rules.no-invalid-css": "off",
+  "lit-plugin.securitySystem": "ClosureSafeTypes",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "explorer.confirmDelete": false,
+  "lit-plugin.rules.no-missing-element-type-definition": "error",
+  "javascript.format.enable": false,
+  "rust-analyzer.cargo.loadOutDirsFromCheck": true,
+  "rust-analyzer.updates.channel": "nightly",
+  "java.configuration.checkProjectSettingsExclusions": false,
+}

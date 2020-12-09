@@ -1,0 +1,68 @@
+// Place your key bindings in this file to overwrite the defaults
+[
+  {
+    "key": "cmd+shift+]",
+    "command": "workbench.action.nextEditor"
+  },
+  {
+    "key": "cmd+shift+[",
+    "command": "workbench.action.previousEditor"
+  },
+  {
+    "key": "cmd+n",
+    "command": "explorer.newFile",
+    "when": "explorerViewletFocus"
+  },
+  {
+    "key": "cmd+g",
+    "command": "explorer.newFolder",
+    "when": "explorerViewletFocus"
+  },
+  {
+    "key": "cmd+t",
+    "command": "workbench.action.tasks.test"
+  },
+  {
+    "key": "cmd+t",
+    "command": "-workbench.action.showAllSymbols"
+  },
+  {
+    "key": "cmd+shift+a",
+    "command": "idris.add-clause",
+    "when": "editorTextFocus && editorLangId == 'idris'"
+  },
+  {
+    "key": "cmd+shift+s",
+    "command": "idris.proof-search",
+    "when": "editorTextFocus && editorLangId == 'idris'"
+  },
+  {
+    "key": "cmd+shift+d",
+    "command": "idris.case-split",
+    "when": "editorTextFocus && editorLangId == 'idris'"
+  },
+  {
+    "key": "cmd+shift+l",
+    "command": "idris.make-lemma",
+    "when": "editorTextFocus && editorLangId == 'idris'"
+  },
+  {
+    "key": "cmd+shift+t",
+    "command": "idris.type-of",
+    "when": "editorTextFocus && editorLangId == 'idris'"
+  },
+  {
+    "key": "cmd+shift+m",
+    "command": "idris.make-case",
+    "when": "editorTextFocus && editorLangId == 'idris'"
+  },
+  {
+    "key": "cmd+shift+w",
+    "command": "idris.make-with",
+    "when": "editorTextFocus && editorLangId == 'idris'"
+  },
+  {
+    "key": "shift+cmd+w",
+    "command": "-workbench.action.closeWindow"
+  }
+]

@@ -1,5 +1,31 @@
-// Place your settings in this file to overwrite the default settings
 {
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter-notebook"
+  },
+  "notebook.cellToolbarLocation": {
+    "default": "right",
+    "jupyter-notebook": "left"
+  },
+  "editor.inlineSuggest.enabled": true,
+  "github.copilot.advanced": {},
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": true,
+    "plaintext": true,
+    "markdown": false,
+    "javascript": true
+  },
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "editor.bracketPairColorization.enabled": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.inlayHints.parameterNames.enabled": "all",
+  "typescript.inlayHints.parameterTypes.enabled": true,
+  "git.autofetch": true,
+  "explorer.confirmDelete": false,
+  "lit-plugin.rules.no-missing-element-type-definition": "error",
+
+
   "editor.tabSize": 2,
   "files.trimTrailingWhitespace": true,
   "editor.rulers": [
@@ -36,12 +62,10 @@
     "editor.rulers": [],
     "editor.wordWrap": "off"
   },
-  "editor.renderIndentGuides": false,
   "search.quickOpen.includeSymbols": true,
   "editor.formatOnPaste": true,
   "css.validate": false,
   "workbench.statusBar.visible": true,
-  "git.autofetch": true,
   "terminal.integrated.scrollback": 20000,
   "editor.tokenColorCustomizations": {},
   "workbench.colorCustomizations": {
@@ -52,10 +76,7 @@
   "editor.suggestSelection": "first",
   "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
   "diffEditor.ignoreTrimWhitespace": true,
-  "editor.find.seedSearchStringFromSelection": false,
-  // "[typescript]": {
-  //   "editor.defaultFormatter": "esbenp.prettier-vscode"
-  // },
+  "editor.find.seedSearchStringFromSelection": "never",
   "workbench.startupEditor": "welcomePage",
   "diffEditor.renderSideBySide": true,
   "files.hotExit": "onExitAndWindowClose",
@@ -90,15 +111,10 @@
   // Does not handle CSS interpolation, or writing with CSS snippets
   "lit-plugin.rules.no-invalid-css": "off",
   "lit-plugin.securitySystem": "ClosureSafeTypes",
-  "typescript.updateImportsOnFileMove.enabled": "always",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
-  "editor.formatOnSave": true,
-  "editor.formatOnType": true,
   "javascript.updateImportsOnFileMove.enabled": "always",
-  "explorer.confirmDelete": false,
-  "lit-plugin.rules.no-missing-element-type-definition": "error",
   "javascript.format.enable": false,
   "rust-analyzer.cargo.loadOutDirsFromCheck": true,
   "rust-analyzer.updates.channel": "nightly",

@@ -26,11 +26,25 @@
     nixfmt-rfc-style
   ];
 
+  home.sessionVariables = {
+    EDITOR = "code -w";
+  };
+
   # Shell configuration
   programs.zsh = {
     enable = true;
     enableCompletion = true;
     autosuggestion.enable = true;
+    shellAliases = {
+      l = "ls -a -l -h";
+      gs = "git status";
+      gc = "git commit";
+      gp = "git push";
+      gca = "git commit -a";
+      gb = "git checkout -b";
+      gclean = "git branch --merged | grep -v \"\*\" | grep -v master | grep -v dev | xargs -n 1 git branch -d";
+      npx = "npx --no-install";
+    };
   };
 
   # Starship prompt

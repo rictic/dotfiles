@@ -32,6 +32,9 @@
             zsh
             starship
             direnv
+
+            # Nix utilities
+            nixfmt-rfc-style
           ];
 
           shellHook = ''

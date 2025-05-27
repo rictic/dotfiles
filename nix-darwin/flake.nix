@@ -1,3 +1,17 @@
+# To use this, go through the nix-darwin setup process, but
+# instead of creating /etc/nix-darwin/flake.nix
+# do:
+#    ln -s ~/open/dotfiles/nix-darwin/flake.nix /etc/nix-darwin/flake.nix
+#
+# I believe these are the complete instructions:
+#    sudo mkdir -p /etc/nix-darwin
+#    sudo chown $(id -nu):$(id -ng) /etc/nix-darwin
+#    cd /etc/nix-darwin
+#    ln -s ~/open/dotfiles/nix-darwin-flake.nix /etc/nix-darwin/flake.nix
+#    sudo nix --extra-experimental-features "nix-command flakes" run nix-darwin/master#darwin-rebuild -- switch
+#
+# And from then on, after changing this file, just do:
+#    sudo darwin-rebuild switch
 {
   description = "nix-darwin system flake";
 
@@ -5,6 +19,8 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-24.11-darwin";
     nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-24.11";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager.url = "github:nix-community/home-manager/release-24.11";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -12,6 +28,7 @@
       self,
       nix-darwin,
       nixpkgs,
+      home-manager,
     }:
     let
       configuration =
@@ -38,13 +55,21 @@
 
           # The platform the configuration will be used on.
           nixpkgs.hostPlatform = "aarch64-darwin";
+
+          users.users.rictic.home = "/Users/rictic";
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.rictic = import ./home.nix;
         };
     in
     {
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#reepicheep
       darwinConfigurations."reepicheep" = nix-darwin.lib.darwinSystem {
-        modules = [ configuration ];
+        modules = [
+          configuration
+          home-manager.darwinModules.home-manager
+        ];
       };
     };
 }

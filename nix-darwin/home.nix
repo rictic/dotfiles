@@ -24,6 +24,9 @@
 
     # Nix utilities
     nixfmt-rfc-style
+
+    # our custom claude code
+    pkgs.claude-code-latest
   ];
 
   home.sessionVariables = {

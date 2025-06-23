@@ -1,3 +1,7 @@
+// Settings in dotfiles. Note that you'll want to hardlink this into
+// your actual vscode settings location, like:
+//   rm ~/Library/Application\ Support/Code/User/settings.json
+//   ln vscode_settings.json ~/Library/Application\ Support/Code/User/settings.json
 {
   "workbench.editorAssociations": {
     "*.ipynb": "jupyter-notebook",

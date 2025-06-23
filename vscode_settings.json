@@ -1,6 +1,7 @@
 {
   "workbench.editorAssociations": {
-    "*.ipynb": "jupyter-notebook"
+    "*.ipynb": "jupyter-notebook",
+    "*.svg": "default"
   },
   "notebook.cellToolbarLocation": {
     "default": "right",
@@ -24,13 +25,9 @@
   "git.autofetch": true,
   "explorer.confirmDelete": false,
   "lit-plugin.rules.no-missing-element-type-definition": "error",
-
-
   "editor.tabSize": 2,
   "files.trimTrailingWhitespace": true,
-  "editor.rulers": [
-    80
-  ],
+  "editor.rulers": [80],
   "clang-format.fallbackStyle": "google",
   "clang-format.language.typescript.enable": true,
   "clang-format.language.javascript.enable": false,
@@ -41,7 +38,6 @@
   "html.suggest.html5": false,
   "files.insertFinalNewline": true,
   "workbench.activityBar.visible": true,
-  "window.zoomLevel": 0,
   "workbench.iconTheme": "vs-seti",
   "typescript.referencesCodeLens.enabled": true,
   "git.confirmSync": false,
@@ -49,7 +45,11 @@
   "editor.minimap.enabled": false,
   "[markdown]": {
     "editor.wordWrap": "bounded",
-    "editor.quickSuggestions": false
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    }
   },
   "[idris]": {
     "editor.formatOnPaste": false
@@ -62,6 +62,11 @@
     "editor.rulers": [],
     "editor.wordWrap": "off"
   },
+  "[nix]": {
+    "editor.defaultFormatter": "jnoortheen.nix-ide"
+  },
+  "nil.formatting.command": ["nixfmt"],
+  "nix.enableLanguageServer": true,
   "search.quickOpen.includeSymbols": true,
   "editor.formatOnPaste": true,
   "css.validate": false,
@@ -77,10 +82,12 @@
   "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
   "diffEditor.ignoreTrimWhitespace": true,
   "editor.find.seedSearchStringFromSelection": "never",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "workbench.startupEditor": "welcomePage",
   "diffEditor.renderSideBySide": true,
   "files.hotExit": "onExitAndWindowClose",
-
   "lit-plugin.strict": true,
   "lit-plugin.rules.no-unknown-tag-name": "error",
   "lit-plugin.rules.no-unclosed-tag": "error",
@@ -110,13 +117,39 @@
   "lit-plugin.rules.no-unknown-slot": "off",
   // Does not handle CSS interpolation, or writing with CSS snippets
   "lit-plugin.rules.no-invalid-css": "off",
-  "lit-plugin.securitySystem": "ClosureSafeTypes",
+  // "lit-plugin.securitySystem": "ClosureSafeTypes",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "javascript.updateImportsOnFileMove.enabled": "always",
   "javascript.format.enable": false,
-  "rust-analyzer.cargo.loadOutDirsFromCheck": true,
   "rust-analyzer.updates.channel": "nightly",
   "java.configuration.checkProjectSettingsExclusions": false,
+  "typescript.tsserver.log": "off",
+  "wireit.trace.server": "verbose",
+  "explorer.confirmDragAndDrop": false,
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "rust-analyzer.cargo.buildScripts.enable": true,
+  "[python]": {
+    "editor.formatOnType": true
+  },
+  "githubPullRequests.pullBranch": "never",
+  "window.zoomLevel": 1,
+  "editor.stickyScroll.enabled": true,
+  "terminal.integrated.enableMultiLinePasteWarning": false,
+  "githubPullRequests.pushBranch": "always",
+  "editor.unicodeHighlight.nonBasicASCII": false,
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "haskell.manageHLS": "GHCup",
+  "remote.SSH.remotePlatform": {
+    "100.121.92.23": "windows"
+  },
+  "terminal.integrated.inheritEnv": false,
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "python.analysis.typeCheckingMode": "standard"
 }

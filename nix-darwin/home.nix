@@ -4,6 +4,7 @@
 {
   # User packages - these will be available in your PATH
   home.packages = with pkgs; [
+
     # Dev tools
     git
     vim
@@ -17,6 +18,9 @@
     python3
     rustc
     cargo
+
+    # Media tools
+    ffmpeg
 
     # Shell utilities (zsh will be configured separately)
     direnv

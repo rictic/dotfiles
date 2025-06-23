@@ -28,6 +28,7 @@
 
     # Nix utilities
     nixfmt-rfc-style
+    nil
 
     # our custom claude code
     pkgs.claude-code-latest

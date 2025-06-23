@@ -1,7 +1,9 @@
-// Settings in dotfiles. Note that you'll want to hardlink this into
-// your actual vscode settings location, like:
-//   rm ~/Library/Application\ Support/Code/User/settings.json
-//   ln vscode_settings.json ~/Library/Application\ Support/Code/User/settings.json
+// Settings in dotfiles. Note that it's tricky to share this file with
+// your actual VSCode because of how VSCode changes the files, neither
+// hardlinks nor softlinks work well. Best I have at the moment is to
+// periodically copy.
+//
+//   cp ~/Library/Application\ Support/Code/User/settings.json ./vscode_settings.json
 {
   "workbench.editorAssociations": {
     "*.ipynb": "jupyter-notebook",
@@ -41,7 +43,6 @@
   "editor.wordWrap": "wordWrapColumn",
   "html.suggest.html5": false,
   "files.insertFinalNewline": true,
-  "workbench.activityBar.visible": true,
   "workbench.iconTheme": "vs-seti",
   "typescript.referencesCodeLens.enabled": true,
   "git.confirmSync": false,
@@ -69,8 +70,14 @@
   "[nix]": {
     "editor.defaultFormatter": "jnoortheen.nix-ide"
   },
-  "nil.formatting.command": ["nixfmt"],
   "nix.enableLanguageServer": true,
+  "nix.serverSettings": {
+    "nil": {
+      "formatting": {
+        "command": ["nixfmt"]
+      }
+    }
+  },
   "search.quickOpen.includeSymbols": true,
   "editor.formatOnPaste": true,
   "css.validate": false,

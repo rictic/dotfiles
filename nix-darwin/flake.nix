@@ -31,13 +31,13 @@
       home-manager,
     }:
     let
+      commonSystemPackages = import ../shared/common-system-packages.nix { inherit pkgs; };
       configuration =
         { pkgs, lib, ... }:
         {
           # List packages installed in system profile. To search by name, run:
           # $ nix-env -qaP | grep wget
-          environment.systemPackages = [
-            pkgs.vim
+          environment.systemPackages = commonSystemPackages ++ [
             pkgs.claude-code-latest
           ];
 
@@ -67,42 +67,9 @@
           users.users.rictic.home = "/Users/rictic";
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.users.rictic = import ./home.nix;
+          home-manager.users.rictic = import ../shared/home-darwin.nix;
         };
-      claude-overlay = final: prev: {
-        claude-code-latest = prev.stdenv.mkDerivation rec {
-          pname = "@anthropic-ai/claude-code";
-          version = "1.0.25";
-
-          src = prev.fetchurl {
-            url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${version}.tgz";
-            hash = "sha512-5p4FLlFO4TuRf0zV0axiOxiAkUC8eer0lqJi/A/pA46LESv31Alw6xaNYgwQVkP6oSbP5PydK36u7YrB9QSaXQ==";
-          };
-
-          buildInputs = [ prev.nodejs ];
-
-          installPhase = ''
-            mkdir -p $out/bin
-            mkdir -p $out/lib/node_modules/@anthropic-ai/claude-code
-
-            # Copy the entire package to the lib directory
-            cp -r . $out/lib/node_modules/@anthropic-ai/claude-code/
-
-            # Create the binary symlink (the actual binary is cli.js according to package.json)
-            ln -s $out/lib/node_modules/@anthropic-ai/claude-code/cli.js $out/bin/claude
-
-            # Make sure the binary is executable
-            chmod +x $out/lib/node_modules/@anthropic-ai/claude-code/cli.js
-          '';
-
-          meta = with prev.lib; {
-            description = "Agentic coding tool that lives in your terminal";
-            homepage = "https://github.com/anthropics/claude-code";
-            license = licenses.unfree;
-            platforms = platforms.darwin;
-          };
-        };
-      };
+      claude-overlay = import ../shared/claude-overlay.nix;
     in
     {
       # Build darwin flake using:

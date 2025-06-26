@@ -459,7 +459,7 @@ in
                 self.send_response(200)
                 self.send_header('Content-type', 'text/plain')
                 self.end_headers()
-                self.wfile.write(f'Hello from {hostname} - auto-update test!\n'.encode())
+                self.wfile.write(f'Hello from {hostname} - auto-update test UPDATED!\n'.encode())
             
             def log_message(self, format, *args):
                 pass  # Suppress default logging

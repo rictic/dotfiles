@@ -42,6 +42,7 @@ in
       CONFIG_FILE="/etc/dotfiles-auto-update.conf"
       SERVICE_NAME="dotfiles-auto-update"
       TIMER_NAME="$SERVICE_NAME.timer"
+      ROOT_DOTFILES_PATH="/etc/dotfiles"
       
       case "''${1:-}" in
         enable)
@@ -81,6 +82,22 @@ in
           fi
           
           echo ""
+          echo "=== Repository Status ==="
+          if [ -d "$ROOT_DOTFILES_PATH" ]; then
+            echo "Root dotfiles repo: EXISTS at $ROOT_DOTFILES_PATH"
+            if [ -d "$ROOT_DOTFILES_PATH/.git" ]; then
+              cd "$ROOT_DOTFILES_PATH"
+              echo "Current branch: $(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'unknown')"
+              echo "Last commit: $(git log -1 --oneline 2>/dev/null || echo 'unknown')"
+              echo "Repository owner: $(stat -c %U . 2>/dev/null || echo 'unknown')"
+            else
+              echo "Not a git repository"
+            fi
+          else
+            echo "Root dotfiles repo: NOT FOUND"
+          fi
+          
+          echo ""
           echo "=== Last runs ==="
           systemctl list-timers "$TIMER_NAME" --no-pager
           ;;
@@ -99,16 +116,25 @@ in
             journalctl -u "$SERVICE_NAME" -n "$LINES" --no-pager
           fi
           ;;
+        reset)
+          echo "Resetting root dotfiles repository..."
+          if [ -d "$ROOT_DOTFILES_PATH" ]; then
+            echo "Removing existing root repository..."
+            sudo rm -rf "$ROOT_DOTFILES_PATH"
+          fi
+          echo "Repository will be re-cloned on next update"
+          ;;
         *)
-          echo "Usage: dotfiles-auto-update-ctl {enable|disable|status|run-now|logs [count|-f]}"
+          echo "Usage: dotfiles-auto-update-ctl {enable|disable|status|run-now|logs [count|-f]|reset}"
           echo ""
           echo "Commands:"
           echo "  enable     - Enable auto-updates"
           echo "  disable    - Disable auto-updates"  
-          echo "  status     - Show current status"
+          echo "  status     - Show current status and repository info"
           echo "  run-now    - Trigger immediate update check"
           echo "  logs [N]   - Show last N log lines (default: 50)"
           echo "  logs -f    - Follow logs in real-time"
+          echo "  reset      - Remove root dotfiles repo (will be re-cloned)"
           exit 1
           ;;
       esac
@@ -211,7 +237,9 @@ in
   environment.etc."dotfiles-auto-update.conf".text = ''
     # Dotfiles auto-update configuration
     DOTFILES_AUTO_UPDATE_ENABLED=true
-    DOTFILES_PATH=/home/rictic/open/dotfiles
+    DOTFILES_PATH=/etc/dotfiles
+    DOTFILES_SOURCE_PATH=/home/rictic/open/dotfiles
+    DOTFILES_REMOTE=https://github.com/rictic/dotfiles.git
     DOTFILES_BRANCH=main
     LOG_LEVEL=info
     
@@ -239,76 +267,55 @@ in
       fi
       
       # Set defaults
-      DOTFILES_PATH="''${DOTFILES_PATH:-/home/rictic/open/dotfiles}"
+      DOTFILES_PATH="''${DOTFILES_PATH:-/etc/dotfiles}"
+      DOTFILES_SOURCE_PATH="''${DOTFILES_SOURCE_PATH:-/home/rictic/open/dotfiles}"
+      DOTFILES_REMOTE="''${DOTFILES_REMOTE:-https://github.com/rictic/dotfiles.git}"
       DOTFILES_BRANCH="''${DOTFILES_BRANCH:-main}"
       LOG_LEVEL="''${LOG_LEVEL:-info}"
       
-      echo "Debug: Current working directory: $(pwd)"
-      echo "Debug: DOTFILES_PATH=$DOTFILES_PATH"
+      echo "Debug: Root-owned dotfiles path: $DOTFILES_PATH"
+      echo "Debug: Source path for reference: $DOTFILES_SOURCE_PATH"
       
-      # Verify dotfiles path exists and is a git repository
+      # Initialize or update the root-owned repository
       if [ ! -d "$DOTFILES_PATH" ]; then
-        echo "Error: Dotfiles path $DOTFILES_PATH does not exist"
-        exit 1
+        echo "Creating root-owned dotfiles repository at $DOTFILES_PATH"
+        mkdir -p "$DOTFILES_PATH"
+        cd "$DOTFILES_PATH"
+        git clone "$DOTFILES_REMOTE" .
+        git checkout "$DOTFILES_BRANCH"
+      else
+        echo "Updating existing root-owned repository"
+        cd "$DOTFILES_PATH"
+        
+        # Ensure we're on the right branch
+        current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+        if [ "$current_branch" != "$DOTFILES_BRANCH" ]; then
+          echo "Switching to $DOTFILES_BRANCH branch (was on $current_branch)"
+          git fetch origin "$DOTFILES_BRANCH"
+          git checkout "$DOTFILES_BRANCH"
+        fi
+        
+        # Check for local changes in root repo
+        if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
+          echo "Local changes detected in root repository, resetting to clean state"
+          git reset --hard HEAD
+          git clean -fd
+        fi
       fi
       
-      if [ ! -d "$DOTFILES_PATH/.git" ]; then
-        echo "Error: $DOTFILES_PATH is not a git repository"
-        exit 1
-      fi
-      
-      echo "Debug: About to change to directory $DOTFILES_PATH"
-      cd "$DOTFILES_PATH" || {
-        echo "Error: Failed to change to directory $DOTFILES_PATH"
-        exit 1
-      }
-      echo "Debug: Successfully changed to directory $(pwd)"
-      
-      # Run git operations as rictic to avoid ownership issues
-      echo "Debug: Checking for local changes (as rictic)..."
-      echo "Debug: Current directory before git commands: $(pwd)"
-      echo "Debug: Contents of current directory: $(ls -la | head -10)"
-      echo "Debug: Git status: $(sudo -u rictic git status --porcelain 2>&1 || echo 'Git status failed')"
-      
-      if ! sudo -u rictic git diff --quiet 2>&1; then
-        echo "Debug: git diff --quiet failed"
-        echo "Local changes detected, skipping auto-update"
-        exit 0
-      fi
-      
-      if ! sudo -u rictic git diff --cached --quiet 2>&1; then
-        echo "Debug: git diff --cached --quiet failed"  
-        echo "Local changes detected, skipping auto-update"
-        exit 0
-      fi
-      
-      # Check if we're on the right branch
-      if ! current_branch=$(sudo -u rictic git rev-parse --abbrev-ref HEAD 2>/dev/null); then
-        echo "Error: Failed to get current branch"
-        exit 1
-      fi
-      
-      if [ "$current_branch" != "$DOTFILES_BRANCH" ]; then
-        echo "Not on $DOTFILES_BRANCH branch (currently on $current_branch), skipping auto-update"
-        exit 0
-      fi
+      echo "Working directory: $(pwd)"
+      echo "Repository owner: $(stat -c %U .)"
       
       # Fetch latest changes
       echo "Fetching latest changes..."
-      if ! sudo -u rictic git fetch origin "$DOTFILES_BRANCH" 2>/dev/null; then
-        echo "Warning: Failed to fetch from origin, continuing with local state"
-      fi
-      
-      # Check if we're behind
-      if ! local_commit=$(sudo -u rictic git rev-parse HEAD 2>/dev/null); then
-        echo "Error: Failed to get local commit"
+      if ! git fetch origin "$DOTFILES_BRANCH" 2>/dev/null; then
+        echo "Warning: Failed to fetch from origin"
         exit 1
       fi
       
-      if ! remote_commit=$(sudo -u rictic git rev-parse "origin/$DOTFILES_BRANCH" 2>/dev/null); then
-        echo "Warning: Failed to get remote commit, assuming we're up to date"
-        exit 0
-      fi
+      # Check if we need to update
+      local_commit=$(git rev-parse HEAD 2>/dev/null)
+      remote_commit=$(git rev-parse "origin/$DOTFILES_BRANCH" 2>/dev/null)
       
       if [ "$local_commit" = "$remote_commit" ]; then
         echo "Already up to date"
@@ -319,7 +326,7 @@ in
       
       # Create backup tag
       backup_tag="backup-before-auto-update-$(date +%Y%m%d-%H%M%S)"
-      if ! sudo -u rictic git tag "$backup_tag"; then
+      if ! git tag "$backup_tag"; then
         echo "Warning: Failed to create backup tag, continuing anyway"
       else
         echo "Created backup tag: $backup_tag"
@@ -342,20 +349,8 @@ in
       
       # Pull changes
       echo "Pulling changes from origin/$DOTFILES_BRANCH..."
-      if ! sudo -u rictic git pull origin "$DOTFILES_BRANCH"; then
+      if ! git pull origin "$DOTFILES_BRANCH"; then
         echo "Error: Failed to pull changes"
-        exit 1
-      fi
-      
-      # Test the configuration
-      echo "Testing new configuration..."
-      if ! sudo -u rictic nix flake check; then
-        echo "Flake check failed, rolling back..."
-        if sudo -u rictic git tag --list | grep -q "^$backup_tag$"; then
-          sudo -u rictic git reset --hard "$backup_tag"
-        else
-          echo "Warning: No backup tag found, cannot rollback"
-        fi
         exit 1
       fi
       
@@ -363,8 +358,8 @@ in
       echo "Testing build..."
       if ! sudo -u rictic nixos-rebuild dry-build --flake ".#$FLAKE_CONFIG"; then
         echo "Build test failed, rolling back..."
-        if sudo -u rictic git tag --list | grep -q "^$backup_tag$"; then
-          sudo -u rictic git reset --hard "$backup_tag"
+        if git tag --list | grep -q "^$backup_tag$"; then
+          git reset --hard "$backup_tag"
         else
           echo "Warning: No backup tag found, cannot rollback"
         fi
@@ -375,8 +370,8 @@ in
       echo "Applying new configuration..."
       if ! nixos-rebuild switch --flake ".#$FLAKE_CONFIG"; then
         echo "Switch failed, rolling back..."
-        if sudo -u rictic git tag --list | grep -q "^$backup_tag$"; then
-          sudo -u rictic git reset --hard "$backup_tag"
+        if git tag --list | grep -q "^$backup_tag$"; then
+          git reset --hard "$backup_tag"
           nixos-rebuild switch --flake ".#$FLAKE_CONFIG" || echo "Rollback failed!"
         else
           echo "Warning: No backup tag found, cannot rollback"
@@ -387,28 +382,27 @@ in
       echo "Auto-update completed successfully"
       
       # Clean up old backup tags (keep last 10)
-      if old_tags=$(sudo -u rictic git tag -l "backup-before-auto-update-*" 2>/dev/null | sort -r | tail -n +11); then
+      if old_tags=$(git tag -l "backup-before-auto-update-*" 2>/dev/null | sort -r | tail -n +11); then
         if [ -n "$old_tags" ]; then
           echo "Cleaning up old backup tags..."
-          echo "$old_tags" | xargs -r sudo -u rictic git tag -d 2>/dev/null || echo "Warning: Failed to clean up some old tags"
+          echo "$old_tags" | xargs -r git tag -d 2>/dev/null || echo "Warning: Failed to clean up some old tags"
         fi
       fi
     '';
     
     serviceConfig = {
       Type = "oneshot";
-      # Run as root since we need to run nixos-rebuild
       User = "root";
       Group = "root";
-      # Don't set WorkingDirectory - let the script handle it
       # Ensure git and other necessary commands are available
       Environment = "PATH=${pkgs.git}/bin:${pkgs.nixos-rebuild}/bin:${pkgs.nix}/bin:/run/current-system/sw/bin";
     };
     
-    # Only run if the dotfiles directory exists and git is available
+    # Only run if git is available - we'll create the directory ourselves
     unitConfig = {
-      ConditionPathExists = [ "/home/rictic/open/dotfiles" "/home/rictic/open/dotfiles/.git" ];
+      # No longer depend on rictic's directory existing
     };
+    
     # Restart on failure after 1 minute
     serviceConfig.Restart = "on-failure";
     serviceConfig.RestartSec = "60";
@@ -459,7 +453,7 @@ in
                 self.send_response(200)
                 self.send_header('Content-type', 'text/plain')
                 self.end_headers()
-                self.wfile.write(f'Hello from {hostname} - auto-update test UPDATED!\n'.encode())
+                self.wfile.write(f'Hello from {hostname} - root-owned repo test!\n'.encode())
             
             def log_message(self, format, *args):
                 pass  # Suppress default logging

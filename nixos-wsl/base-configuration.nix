@@ -314,10 +314,10 @@ in
       
       # Apply the configuration
       echo "Applying new configuration..."
-      if ! nixos-rebuild switch --flake ".#$FLAKE_CONFIG"; then
+      if ! sudo nixos-rebuild switch --flake ".#$FLAKE_CONFIG"; then
         echo "Switch failed, rolling back..."
         git reset --hard "$backup_tag"
-        nixos-rebuild switch --flake ".#$FLAKE_CONFIG" || echo "Rollback failed!"
+        sudo nixos-rebuild switch --flake ".#$FLAKE_CONFIG" || echo "Rollback failed!"
         exit 1
       fi
       

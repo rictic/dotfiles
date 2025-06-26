@@ -6,142 +6,40 @@ This directory contains configurations for multiple WSL NixOS machines. Each mac
 
 - **abadar** - Located in `nixos-wsl/abadar/`
 - **wizardfoot** - Located in `nixos-wsl/wizardfoot/`
-- **nixos-wsl** - Legacy configuration (for backward compatibility)
 
 ## Quick Start
 
-### For Abadar machine:
-```bash
-cd ~/open/dotfiles
-sudo nixos-rebuild switch --flake .#abadar
-```
-
-### For Wizardfoot machine:
-```bash
-cd ~/open/dotfiles
-sudo nixos-rebuild switch --flake .#wizardfoot
-```
-
-## Architecture
-
-- **`base-configuration.nix`** - Shared configuration used by all WSL machines
-- **`abadar/configuration.nix`** - Abadar-specific configuration
-- **`wizardfoot/configuration.nix`** - Wizardfoot-specific configuration
-- **`configuration.nix`** - Legacy configuration (kept for backward compatibility)
-
-## Prerequisites
-
 1. Install NixOS-WSL following the [official guide](https://github.com/nix-community/NixOS-WSL)
-2. Clone inside the WSL environment:
-   ```bash
-   git clone https://github.com/rictic/dotfiles ~/open/dotfiles
-   ```
+2. Inside the new NixOS distro, run:
 
-## Installation
+```bash
+git clone https://github.com/rictic/dotfiles
+cd dotfiles
+# The first time you must specify the machine name to use.
+sudo nixos-rebuild switch --flake .#abadar
+exit
+```
 
-Choose the appropriate configuration for your machine:
+This should drop you back into your windows shell, where you should run:
 
-### For Abadar:
-1. **Test the flake configuration first (optional but recommended):**
-   ```bash
-   cd ~/open/dotfiles
-   sudo nixos-rebuild dry-build --flake .#abadar
-   ```
-
-2. **Apply the configuration:**
-   ```bash
-   cd ~/open/dotfiles
-   sudo nixos-rebuild switch --flake .#abadar
-   ```
-
-### For Wizardfoot:
-1. **Test the flake configuration first (optional but recommended):**
-   ```bash
-   cd ~/open/dotfiles
-   sudo nixos-rebuild dry-build --flake .#wizardfoot
-   ```
-
-2. **Apply the configuration:**
-   ```bash
-   cd ~/open/dotfiles
-   sudo nixos-rebuild switch --flake .#wizardfoot
-   ```
-
-### Common Post-installation Steps:
-1. **Set up your user shell:**
-   ```bash
-   chsh -s $(which zsh)
-   ```
-
-## Post-installation setup
-
-After the initial configuration, you may need to switch to the `rictic` user:
-
-1. **Switch to the rictic user:**
-   ```bash
-   su - rictic
-   ```
-
-2. **Set a password for the rictic user:**
-   ```bash
-   sudo passwd rictic
-   ```
-
-3. **Make rictic the default WSL user**:
-
-Edit /etc/wsl.conf to ensure that it has rictic as the default user.
-
-   ```
-   [user]
-   default=rictic
-   ```
-
-4. **Restart WSL to apply the default user change:**
-   ```powershell
-   wsl --shutdown
-   wsl
-   ```
-
-5. **Once logged in as rictic, set up zsh as your shell:**
-   ```bash
-   chsh -s $(which zsh)
-   ```
+```powershell
+wsl --shutdown
+wsl
+```
 
 ## Making changes
 
 ### Machine-specific changes:
-- **Abadar**: Edit `nixos-wsl/abadar/configuration.nix` and apply with:
-  ```bash
-  cd ~/open/dotfiles
-  sudo nixos-rebuild switch --flake .#abadar
-  ```
+- **Abadar**: Edit `nixos-wsl/abadar/configuration.nix`
+- **Wizardfoot**: Edit `nixos-wsl/wizardfoot/configuration.nix`
 
-- **Wizardfoot**: Edit `nixos-wsl/wizardfoot/configuration.nix` and apply with:
-  ```bash
-  cd ~/open/dotfiles
-  sudo nixos-rebuild switch --flake .#wizardfoot
-  ```
-
-### Shared changes:
-Edit `nixos-wsl/base-configuration.nix` to make changes that affect all machines, then apply the configuration for each machine you want to update.
-
-## Testing configurations
-
-To test your configuration without applying it:
-
-**Abadar:**
+After making changes, apply them with:
 ```bash
 cd ~/open/dotfiles
-sudo nixos-rebuild dry-build --flake .#abadar
-sudo nixos-rebuild dry-activate --flake .#abadar
+sudo nixos-rebuild switch --flake .
 ```
 
-**Wizardfoot:**
-```bash
-cd ~/open/dotfiles
-sudo nixos-rebuild dry-build --flake .#wizardfoot
-sudo nixos-rebuild dry-activate --flake .#wizardfoot
-```
+Changes pushed up to github will by automatically applied every ~5 minutes.
 
 ## Auto-Update System
 
@@ -179,28 +77,6 @@ dotfiles-auto-update-ctl logs
 dotfiles-auto-update-ctl logs 100
 ```
 
-### Configuration
-
-The auto-update behavior can be configured by editing `/etc/dotfiles-auto-update.conf`:
-
-```bash
-sudo nano /etc/dotfiles-auto-update.conf
-```
-
-Options:
-- `DOTFILES_AUTO_UPDATE_ENABLED` - Set to `false` to disable
-- `DOTFILES_PATH` - Path to your dotfiles repository
-- `DOTFILES_BRANCH` - Git branch to track (default: main)
-- `LOG_LEVEL` - Logging verbosity
-
-### Safety features
-
-- **Local changes detection** - Won't update if you have uncommitted changes
-- **Test before apply** - Validates flake and tests build before switching
-- **Backup tags** - Creates git tags before each update for easy rollback
-- **Rollback on failure** - Automatically rolls back if tests fail
-- **Network timeout** - Won't hang on network issues
-
 ### Troubleshooting
 
 If something goes wrong:
@@ -218,14 +94,6 @@ If something goes wrong:
 3. **Temporarily disable:**
    ```bash
    dotfiles-auto-update-ctl disable
-   ```
-
-4. **Manual rollback if needed:**
-   ```bash
-   cd ~/open/dotfiles
-   git tag -l "backup-before-auto-update-*"  # List backup tags
-   git reset --hard backup-before-auto-update-XXXXXXX  # Replace with actual tag
-   sudo nixos-rebuild switch --flake .#nixos-wsl
    ```
 
 ## Key differences from nix-darwin

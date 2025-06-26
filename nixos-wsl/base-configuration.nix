@@ -260,7 +260,7 @@ in
       
       # Fetch latest changes
       echo "Fetching latest changes..."
-      git fetch origin "$DOTFILES_BRANCH" --timeout=30
+      git fetch origin "$DOTFILES_BRANCH"
       
       # Check if we're behind
       local_commit=$(git rev-parse HEAD)
@@ -298,7 +298,7 @@ in
       
       # Test the configuration
       echo "Testing new configuration..."
-      if ! nix flake check --timeout 300; then
+      if ! nix flake check; then
         echo "Flake check failed, rolling back..."
         git reset --hard "$backup_tag"
         exit 1
@@ -306,7 +306,7 @@ in
       
       # Test build
       echo "Testing build..."
-      if ! nixos-rebuild dry-build --flake ".#$FLAKE_CONFIG" --timeout 600; then
+      if ! nixos-rebuild dry-build --flake ".#$FLAKE_CONFIG"; then
         echo "Build test failed, rolling back..."
         git reset --hard "$backup_tag"
         exit 1

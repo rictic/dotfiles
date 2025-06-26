@@ -243,16 +243,51 @@ in
       DOTFILES_BRANCH="''${DOTFILES_BRANCH:-main}"
       LOG_LEVEL="''${LOG_LEVEL:-info}"
       
-      cd "$DOTFILES_PATH"
+      echo "Debug: Current working directory: $(pwd)"
+      echo "Debug: DOTFILES_PATH=$DOTFILES_PATH"
       
-      # Check if we have local changes
-      if ! git diff --quiet || ! git diff --cached --quiet; then
+      # Verify dotfiles path exists and is a git repository
+      if [ ! -d "$DOTFILES_PATH" ]; then
+        echo "Error: Dotfiles path $DOTFILES_PATH does not exist"
+        exit 1
+      fi
+      
+      if [ ! -d "$DOTFILES_PATH/.git" ]; then
+        echo "Error: $DOTFILES_PATH is not a git repository"
+        exit 1
+      fi
+      
+      echo "Debug: About to change to directory $DOTFILES_PATH"
+      cd "$DOTFILES_PATH" || {
+        echo "Error: Failed to change to directory $DOTFILES_PATH"
+        exit 1
+      }
+      echo "Debug: Successfully changed to directory $(pwd)"
+      
+      # Run git operations as rictic to avoid ownership issues
+      echo "Debug: Checking for local changes (as rictic)..."
+      echo "Debug: Current directory before git commands: $(pwd)"
+      echo "Debug: Contents of current directory: $(ls -la | head -10)"
+      echo "Debug: Git status: $(sudo -u rictic git status --porcelain 2>&1 || echo 'Git status failed')"
+      
+      if ! sudo -u rictic git diff --quiet 2>&1; then
+        echo "Debug: git diff --quiet failed"
+        echo "Local changes detected, skipping auto-update"
+        exit 0
+      fi
+      
+      if ! sudo -u rictic git diff --cached --quiet 2>&1; then
+        echo "Debug: git diff --cached --quiet failed"  
         echo "Local changes detected, skipping auto-update"
         exit 0
       fi
       
       # Check if we're on the right branch
-      current_branch=$(git rev-parse --abbrev-ref HEAD)
+      if ! current_branch=$(sudo -u rictic git rev-parse --abbrev-ref HEAD 2>/dev/null); then
+        echo "Error: Failed to get current branch"
+        exit 1
+      fi
+      
       if [ "$current_branch" != "$DOTFILES_BRANCH" ]; then
         echo "Not on $DOTFILES_BRANCH branch (currently on $current_branch), skipping auto-update"
         exit 0
@@ -260,11 +295,20 @@ in
       
       # Fetch latest changes
       echo "Fetching latest changes..."
-      git fetch origin "$DOTFILES_BRANCH"
+      if ! sudo -u rictic git fetch origin "$DOTFILES_BRANCH" 2>/dev/null; then
+        echo "Warning: Failed to fetch from origin, continuing with local state"
+      fi
       
       # Check if we're behind
-      local_commit=$(git rev-parse HEAD)
-      remote_commit=$(git rev-parse "origin/$DOTFILES_BRANCH")
+      if ! local_commit=$(sudo -u rictic git rev-parse HEAD 2>/dev/null); then
+        echo "Error: Failed to get local commit"
+        exit 1
+      fi
+      
+      if ! remote_commit=$(sudo -u rictic git rev-parse "origin/$DOTFILES_BRANCH" 2>/dev/null); then
+        echo "Warning: Failed to get remote commit, assuming we're up to date"
+        exit 0
+      fi
       
       if [ "$local_commit" = "$remote_commit" ]; then
         echo "Already up to date"
@@ -275,8 +319,11 @@ in
       
       # Create backup tag
       backup_tag="backup-before-auto-update-$(date +%Y%m%d-%H%M%S)"
-      git tag "$backup_tag"
-      echo "Created backup tag: $backup_tag"
+      if ! sudo -u rictic git tag "$backup_tag"; then
+        echo "Warning: Failed to create backup tag, continuing anyway"
+      else
+        echo "Created backup tag: $backup_tag"
+      fi
       
       # Try to determine which flake config to use
       if [ -z "''${FLAKE_CONFIG:-}" ]; then
@@ -294,13 +341,21 @@ in
       fi
       
       # Pull changes
-      git pull origin "$DOTFILES_BRANCH"
+      echo "Pulling changes from origin/$DOTFILES_BRANCH..."
+      if ! sudo -u rictic git pull origin "$DOTFILES_BRANCH"; then
+        echo "Error: Failed to pull changes"
+        exit 1
+      fi
       
       # Test the configuration
       echo "Testing new configuration..."
       if ! nix flake check; then
         echo "Flake check failed, rolling back..."
-        git reset --hard "$backup_tag"
+        if sudo -u rictic git tag --list | grep -q "^$backup_tag$"; then
+          sudo -u rictic git reset --hard "$backup_tag"
+        else
+          echo "Warning: No backup tag found, cannot rollback"
+        fi
         exit 1
       fi
       
@@ -308,7 +363,11 @@ in
       echo "Testing build..."
       if ! nixos-rebuild dry-build --flake ".#$FLAKE_CONFIG"; then
         echo "Build test failed, rolling back..."
-        git reset --hard "$backup_tag"
+        if sudo -u rictic git tag --list | grep -q "^$backup_tag$"; then
+          sudo -u rictic git reset --hard "$backup_tag"
+        else
+          echo "Warning: No backup tag found, cannot rollback"
+        fi
         exit 1
       fi
       
@@ -316,18 +375,23 @@ in
       echo "Applying new configuration..."
       if ! nixos-rebuild switch --flake ".#$FLAKE_CONFIG"; then
         echo "Switch failed, rolling back..."
-        git reset --hard "$backup_tag"
-        nixos-rebuild switch --flake ".#$FLAKE_CONFIG" || echo "Rollback failed!"
+        if sudo -u rictic git tag --list | grep -q "^$backup_tag$"; then
+          sudo -u rictic git reset --hard "$backup_tag"
+          nixos-rebuild switch --flake ".#$FLAKE_CONFIG" || echo "Rollback failed!"
+        else
+          echo "Warning: No backup tag found, cannot rollback"
+        fi
         exit 1
       fi
       
       echo "Auto-update completed successfully"
       
       # Clean up old backup tags (keep last 10)
-      old_tags=$(git tag -l "backup-before-auto-update-*" | sort -r | tail -n +11)
-      if [ -n "$old_tags" ]; then
-        echo "Cleaning up old backup tags..."
-        echo "$old_tags" | xargs git tag -d
+      if old_tags=$(sudo -u rictic git tag -l "backup-before-auto-update-*" 2>/dev/null | sort -r | tail -n +11); then
+        if [ -n "$old_tags" ]; then
+          echo "Cleaning up old backup tags..."
+          echo "$old_tags" | xargs -r sudo -u rictic git tag -d 2>/dev/null || echo "Warning: Failed to clean up some old tags"
+        fi
       fi
     '';
     
@@ -336,7 +400,7 @@ in
       # Run as root since we need to run nixos-rebuild
       User = "root";
       Group = "root";
-      WorkingDirectory = "/home/rictic/open/dotfiles";
+      # Don't set WorkingDirectory - let the script handle it
       # Ensure git and other necessary commands are available
       Environment = "PATH=${pkgs.git}/bin:${pkgs.nixos-rebuild}/bin:${pkgs.nix}/bin:/run/current-system/sw/bin";
     };

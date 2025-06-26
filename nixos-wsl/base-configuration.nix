@@ -274,7 +274,6 @@ in
       LOG_LEVEL="''${LOG_LEVEL:-info}"
       
       echo "Debug: Root-owned dotfiles path: $DOTFILES_PATH"
-      echo "Debug: Source path for reference: $DOTFILES_SOURCE_PATH"
       
       # Initialize or update the root-owned repository
       if [ ! -d "$DOTFILES_PATH" ]; then
@@ -312,7 +311,7 @@ in
         echo "Warning: Failed to fetch from origin"
         exit 1
       fi
-      
+
       # Check if we need to update
       local_commit=$(git rev-parse HEAD 2>/dev/null)
       remote_commit=$(git rev-parse "origin/$DOTFILES_BRANCH" 2>/dev/null)
@@ -323,30 +322,7 @@ in
       fi
       
       echo "Updates available, proceeding with auto-update..."
-      
-      # Create backup tag
-      backup_tag="backup-before-auto-update-$(date +%Y%m%d-%H%M%S)"
-      if ! git tag "$backup_tag"; then
-        echo "Warning: Failed to create backup tag, continuing anyway"
-      else
-        echo "Created backup tag: $backup_tag"
-      fi
-      
-      # Try to determine which flake config to use
-      if [ -z "''${FLAKE_CONFIG:-}" ]; then
-        # Try to detect from hostname or use a default
-        if [ -f /etc/hostname ]; then
-          hostname=$(cat /etc/hostname)
-          case "$hostname" in
-            *abadar*) FLAKE_CONFIG="abadar" ;;
-            *wizardfoot*) FLAKE_CONFIG="wizardfoot" ;;
-            *) FLAKE_CONFIG="nixos-wsl" ;;  # fallback to legacy
-          esac
-        else
-          FLAKE_CONFIG="nixos-wsl"  # fallback to legacy
-        fi
-      fi
-      
+
       # Pull changes
       echo "Pulling changes from origin/$DOTFILES_BRANCH..."
       if ! git pull origin "$DOTFILES_BRANCH"; then
@@ -356,38 +332,19 @@ in
       
       # Test build
       echo "Testing build..."
-      if ! sudo -u rictic nixos-rebuild dry-build --flake ".#$FLAKE_CONFIG"; then
-        echo "Build test failed, rolling back..."
-        if git tag --list | grep -q "^$backup_tag$"; then
-          git reset --hard "$backup_tag"
-        else
-          echo "Warning: No backup tag found, cannot rollback"
-        fi
+      if ! nixos-rebuild dry-build --flake ".#$FLAKE_CONFIG"; then
+        echo "Build test failed, not applying changes."
         exit 1
       fi
       
       # Apply the configuration
       echo "Applying new configuration..."
       if ! nixos-rebuild switch --flake ".#$FLAKE_CONFIG"; then
-        echo "Switch failed, rolling back..."
-        if git tag --list | grep -q "^$backup_tag$"; then
-          git reset --hard "$backup_tag"
-          nixos-rebuild switch --flake ".#$FLAKE_CONFIG" || echo "Rollback failed!"
-        else
-          echo "Warning: No backup tag found, cannot rollback"
-        fi
+        echo "Switch failed. Changes likely not applied."
         exit 1
       fi
       
       echo "Auto-update completed successfully"
-      
-      # Clean up old backup tags (keep last 10)
-      if old_tags=$(git tag -l "backup-before-auto-update-*" 2>/dev/null | sort -r | tail -n +11); then
-        if [ -n "$old_tags" ]; then
-          echo "Cleaning up old backup tags..."
-          echo "$old_tags" | xargs -r git tag -d 2>/dev/null || echo "Warning: Failed to clean up some old tags"
-        fi
-      fi
     '';
     
     serviceConfig = {

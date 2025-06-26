@@ -361,7 +361,7 @@ in
       
       # Test build
       echo "Testing build..."
-      if ! nixos-rebuild dry-build --flake ".#$FLAKE_CONFIG"; then
+      if ! sudo -u rictic nixos-rebuild dry-build --flake ".#$FLAKE_CONFIG"; then
         echo "Build test failed, rolling back..."
         if sudo -u rictic git tag --list | grep -q "^$backup_tag$"; then
           sudo -u rictic git reset --hard "$backup_tag"

@@ -349,7 +349,7 @@ in
       
       # Test the configuration
       echo "Testing new configuration..."
-      if ! nix flake check; then
+      if ! sudo -u rictic nix flake check; then
         echo "Flake check failed, rolling back..."
         if sudo -u rictic git tag --list | grep -q "^$backup_tag$"; then
           sudo -u rictic git reset --hard "$backup_tag"

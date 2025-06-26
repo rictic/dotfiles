@@ -49,3 +49,15 @@ sudo darwin-rebuild switch --flake .#rictic-macbook
 # NixOS
 sudo nixos-rebuild switch --flake .#nixos-wsl
 ```
+
+## Auto-Update (NixOS only)
+
+The NixOS configuration includes an automatic update system that:
+- Checks for repository updates every 5 minutes
+- Tests changes before applying them
+- Creates backup points for easy rollback
+- Logs all activity to systemd journal
+
+Manage with: `dotfiles-auto-update-ctl {enable|disable|status|logs}`
+
+See [NixOS WSL Setup](./nixos-wsl/README.md) for detailed documentation.

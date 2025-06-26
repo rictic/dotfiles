@@ -1,5 +1,34 @@
 # NixOS WSL Configuration
 
+This directory contains configurations for multiple WSL NixOS machines. Each machine has its own named configuration that inherits from a shared base.
+
+## Available Machines
+
+- **abadar** - Located in `nixos-wsl/abadar/`
+- **wizardfoot** - Located in `nixos-wsl/wizardfoot/`
+- **nixos-wsl** - Legacy configuration (for backward compatibility)
+
+## Quick Start
+
+### For Abadar machine:
+```bash
+cd ~/open/dotfiles
+sudo nixos-rebuild switch --flake .#abadar
+```
+
+### For Wizardfoot machine:
+```bash
+cd ~/open/dotfiles
+sudo nixos-rebuild switch --flake .#wizardfoot
+```
+
+## Architecture
+
+- **`base-configuration.nix`** - Shared configuration used by all WSL machines
+- **`abadar/configuration.nix`** - Abadar-specific configuration
+- **`wizardfoot/configuration.nix`** - Wizardfoot-specific configuration
+- **`configuration.nix`** - Legacy configuration (kept for backward compatibility)
+
 ## Prerequisites
 
 1. Install NixOS-WSL following the [official guide](https://github.com/nix-community/NixOS-WSL)
@@ -10,19 +39,36 @@
 
 ## Installation
 
+Choose the appropriate configuration for your machine:
+
+### For Abadar:
 1. **Test the flake configuration first (optional but recommended):**
    ```bash
    cd ~/open/dotfiles
-   sudo nixos-rebuild dry-build --flake .#nixos-wsl
+   sudo nixos-rebuild dry-build --flake .#abadar
    ```
 
-2. **Apply the configuration directly from your dotfiles:**
+2. **Apply the configuration:**
    ```bash
    cd ~/open/dotfiles
-   sudo nixos-rebuild switch --flake .#nixos-wsl
+   sudo nixos-rebuild switch --flake .#abadar
    ```
 
-3. **Set up your user shell:**
+### For Wizardfoot:
+1. **Test the flake configuration first (optional but recommended):**
+   ```bash
+   cd ~/open/dotfiles
+   sudo nixos-rebuild dry-build --flake .#wizardfoot
+   ```
+
+2. **Apply the configuration:**
+   ```bash
+   cd ~/open/dotfiles
+   sudo nixos-rebuild switch --flake .#wizardfoot
+   ```
+
+### Common Post-installation Steps:
+1. **Set up your user shell:**
    ```bash
    chsh -s $(which zsh)
    ```
@@ -61,26 +107,40 @@ Edit /etc/wsl.conf to ensure that it has rictic as the default user.
    chsh -s $(which zsh)
    ```
 
-## Testing the configuration
-
-To test your configuration without applying it:
-```bash
-cd ~/open/dotfiles
-sudo nixos-rebuild dry-build --flake .#nixos-wsl
-```
-
-To check what changes would be made:
-```bash
-cd ~/open/dotfiles
-sudo nixos-rebuild dry-activate --flake .#nixos-wsl
-```
-
 ## Making changes
 
-After modifying any of the configuration files, apply changes with:
+### Machine-specific changes:
+- **Abadar**: Edit `nixos-wsl/abadar/configuration.nix` and apply with:
+  ```bash
+  cd ~/open/dotfiles
+  sudo nixos-rebuild switch --flake .#abadar
+  ```
+
+- **Wizardfoot**: Edit `nixos-wsl/wizardfoot/configuration.nix` and apply with:
+  ```bash
+  cd ~/open/dotfiles
+  sudo nixos-rebuild switch --flake .#wizardfoot
+  ```
+
+### Shared changes:
+Edit `nixos-wsl/base-configuration.nix` to make changes that affect all machines, then apply the configuration for each machine you want to update.
+
+## Testing configurations
+
+To test your configuration without applying it:
+
+**Abadar:**
 ```bash
 cd ~/open/dotfiles
-sudo nixos-rebuild switch --flake .#nixos-wsl
+sudo nixos-rebuild dry-build --flake .#abadar
+sudo nixos-rebuild dry-activate --flake .#abadar
+```
+
+**Wizardfoot:**
+```bash
+cd ~/open/dotfiles
+sudo nixos-rebuild dry-build --flake .#wizardfoot
+sudo nixos-rebuild dry-activate --flake .#wizardfoot
 ```
 
 ## Auto-Update System

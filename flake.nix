@@ -43,7 +43,50 @@
         ];
       };
 
-      # NixOS WSL configuration
+      # NixOS WSL configurations
+      nixosConfigurations.abadar = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          nixos-wsl.nixosModules.wsl
+          ./nixos-wsl/abadar/configuration.nix
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = false;
+            home-manager.useUserPackages = true;
+            home-manager.users.rictic = import ./shared/home-nixos.nix;
+            home-manager.extraSpecialArgs = { inherit inputs; };
+            home-manager.sharedModules = [
+              {
+                nixpkgs.overlays = [ claude-overlay ];
+                nixpkgs.config.allowUnfree = true;
+              }
+            ];
+          }
+        ];
+      };
+
+      nixosConfigurations.wizardfoot = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          nixos-wsl.nixosModules.wsl
+          ./nixos-wsl/wizardfoot/configuration.nix
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = false;
+            home-manager.useUserPackages = true;
+            home-manager.users.rictic = import ./shared/home-nixos.nix;
+            home-manager.extraSpecialArgs = { inherit inputs; };
+            home-manager.sharedModules = [
+              {
+                nixpkgs.overlays = [ claude-overlay ];
+                nixpkgs.config.allowUnfree = true;
+              }
+            ];
+          }
+        ];
+      };
+
+      # Legacy configuration for backward compatibility
       nixosConfigurations.nixos-wsl = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [

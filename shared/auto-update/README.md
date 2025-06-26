@@ -16,7 +16,7 @@ Import the module in your NixOS configuration:
 ```nix
 {
   imports = [
-    ../shared/dotfiles-auto-update.nix
+    ../shared/auto-update/dotfiles-auto-update.nix
   ];
 
   services.dotfiles-auto-update = {

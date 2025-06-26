@@ -112,7 +112,7 @@ in {
       after = [ "network.target" ];
       wants = [ "network.target" ];
       
-      script = "${updateScript}/bin/dotfiles-auto-update";
+      script = "${updateScript}";
       
       serviceConfig = {
         Type = "oneshot";

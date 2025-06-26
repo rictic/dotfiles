@@ -8,7 +8,7 @@ in
 {
   # Import the auto-update module
   imports = [
-    ../shared/dotfiles-auto-update.nix
+    ../shared/auto-update/dotfiles-auto-update.nix
   ];
 
   # Allow unfree packages (needed for some packages like steam-run)

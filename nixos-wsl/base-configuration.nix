@@ -314,10 +314,10 @@ in
       
       # Apply the configuration
       echo "Applying new configuration..."
-      if ! sudo nixos-rebuild switch --flake ".#$FLAKE_CONFIG"; then
+      if ! nixos-rebuild switch --flake ".#$FLAKE_CONFIG"; then
         echo "Switch failed, rolling back..."
         git reset --hard "$backup_tag"
-        sudo nixos-rebuild switch --flake ".#$FLAKE_CONFIG" || echo "Rollback failed!"
+        nixos-rebuild switch --flake ".#$FLAKE_CONFIG" || echo "Rollback failed!"
         exit 1
       fi
       
@@ -333,8 +333,9 @@ in
     
     serviceConfig = {
       Type = "oneshot";
-      User = "rictic";
-      Group = "users";
+      # Run as root since we need to run nixos-rebuild
+      User = "root";
+      Group = "root";
       WorkingDirectory = "/home/rictic/open/dotfiles";
       # Ensure git and other necessary commands are available
       Environment = "PATH=${pkgs.git}/bin:${pkgs.nixos-rebuild}/bin:${pkgs.nix}/bin:/run/current-system/sw/bin";

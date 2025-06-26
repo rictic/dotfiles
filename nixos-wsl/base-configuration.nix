@@ -336,6 +336,8 @@ in
       User = "rictic";
       Group = "users";
       WorkingDirectory = "/home/rictic/open/dotfiles";
+      # Ensure git and other necessary commands are available
+      Environment = "PATH=${pkgs.git}/bin:${pkgs.nixos-rebuild}/bin:${pkgs.nix}/bin:/run/current-system/sw/bin";
     };
     
     # Only run if the dotfiles directory exists and git is available

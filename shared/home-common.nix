@@ -58,6 +58,7 @@ in
     enable = true;
     enableZshIntegration = true;
     defaultOptions = [ "--height 40%" "--border" ];
+    defaultCommand = "fd --type f";
   };
 
   home.stateVersion = "24.11";

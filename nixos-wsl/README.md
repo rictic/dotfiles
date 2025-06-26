@@ -1,21 +1,11 @@
 # NixOS WSL Configuration
 
-This directory contains a NixOS configuration adapted from the nix-darwin setup for use with NixOS running in WSL2.
-
-## What's been adapted
-
-- **Base system**: Switched from nix-darwin to NixOS with WSL integration
-- **Packages**: Kept all the same development tools and utilities
-- **Home Manager**: Preserved your shell configuration, git settings, and development environment
-- **WSL Integration**: Added WSL-specific settings and Windows integration features
-- **Architecture**: Changed from `aarch64-darwin` to `x86_64-linux`
-
 ## Prerequisites
 
 1. Install NixOS-WSL following the [official guide](https://github.com/nix-community/NixOS-WSL)
-2. Clone your dotfiles repository in the WSL environment:
+2. Clone inside the WSL environment:
    ```bash
-   git clone <your-dotfiles-repo> ~/open/dotfiles
+   git clone https://github.com/rictic/dotfiles ~/open/dotfiles
    ```
 
 ## Installation
@@ -59,9 +49,13 @@ After the initial configuration, you may need to switch to the `rictic` user:
    sudo passwd rictic
    ```
 
-3. **Make rictic the default WSL user** (run this in Windows PowerShell, not WSL):
-   ```powershell
-   wsl --set-default-user rictic
+3. **Make rictic the default WSL user**:
+
+Edit /etc/wsl.conf to ensure that it has rictic as the default user.
+
+   ```
+   [user]
+   default=rictic
    ```
 
 4. **Restart WSL to apply the default user change:**
@@ -99,30 +93,5 @@ sudo nixos-rebuild switch --flake /etc/nixos#nixos-wsl --impure
 
 - **System packages** are defined in `configuration.nix` instead of the flake directly
 - **WSL-specific settings** for Windows integration
-- **Docker support** enabled for development
 - **Additional Linux tools** like `htop`, `bat`, `eza`, and `fd`
 - **VS Code integration** configured for WSL development
-- **Claude Code** temporarily disabled due to build issues (can be installed manually with `npm install -g @anthropic-ai/claude-code`)
-
-## File structure
-
-- `flake.nix` - Main flake configuration with inputs and outputs
-- `configuration.nix` - System-level NixOS configuration
-- `home.nix` - User-level Home Manager configuration (adapted from nix-darwin version)
-
-## Features preserved from nix-darwin
-
-- All development tools (Node.js, Python, Rust, etc.)
-- Shell configuration with zsh, starship, and custom aliases
-- Git configuration with your user details
-- Tmux and direnv integration
-- Nix formatting and language server tools
-- Custom Claude Code package (temporarily disabled, can install manually)
-
-## WSL-specific features added
-
-- Windows path integration (disabled by default, can be enabled)
-- WSL utilities (`wslu`)
-- VS Code integration for WSL development
-- Docker support for containerized development
-- Proper handling of Windows/Linux line endings in git

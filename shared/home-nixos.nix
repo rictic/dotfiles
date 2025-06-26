@@ -16,9 +16,6 @@
     
     # WSL integration tools
     pkgs.wslu
-
-    # Uncomment if claude-code builds successfully
-    # pkgs.claude-code-latest
   ];
 
   # WSL-specific session variables
@@ -72,7 +69,5 @@
   };
 
   # FZF with fd integration
-  programs.fzf = {
-    defaultCommand = "fd --type f";
-  };
+ 
 }

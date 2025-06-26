@@ -26,4 +26,6 @@ with pkgs; [
   # Nix utilities
   nixfmt-rfc-style
   nil
+
+  pkgs.claude-code-latest
 ]

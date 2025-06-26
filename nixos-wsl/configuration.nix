@@ -23,9 +23,13 @@ in
     
     # WSL-specific utilities
     pkgs.wslu  # WSL utilities
+    
+    # Add steam-run for FHS compatibility (useful for running non-Nix binaries)
+    pkgs.steam-run
   ];
 
   # Allow specific unfree packages (same as nix-darwin)
+  nixpkgs.config.allowUnfree = true;
   # nixpkgs.config.allowUnfreePredicate =
   #   pkg:
   #   builtins.elem (lib.getName pkg) [
@@ -53,7 +57,21 @@ in
   # Enable git system-wide
   programs.git.enable = true;
 
+  # Enable NixOS compatibility for VS Code server and other dynamically linked executables
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    # Add common libraries that VS Code server might need
+    stdenv.cc.cc.lib
+    zlib
+    openssl
+    curl
+    expat
+    libxml2
+    libxcrypt-legacy
+  ];
+
   # Docker support (useful for development in WSL)
+  # Uncomment the following lines if you need Docker support
   #virtualisation.docker = {
   #  enable = true;
   #  enableOnBoot = true;

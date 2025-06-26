@@ -41,19 +41,23 @@
           # WSL-specific module
           nixos-wsl.nixosModules.wsl
           
-          # Apply the claude overlay
-          { nixpkgs.overlays = [ claude-overlay ]; }
-          
           # Main system configuration
           ./configuration.nix
           
           # Home Manager integration
           home-manager.nixosModules.home-manager
           {
-            home-manager.useGlobalPkgs = true;
+            home-manager.useGlobalPkgs = false;
             home-manager.useUserPackages = true;
             home-manager.users.rictic = import ../shared/home-nixos.nix;
             home-manager.extraSpecialArgs = { inherit inputs; };
+            # Apply overlays per user
+            home-manager.sharedModules = [ 
+              { 
+                nixpkgs.overlays = [ claude-overlay ]; 
+                nixpkgs.config.allowUnfree = true;
+              }
+            ];
           }
         ];
       };

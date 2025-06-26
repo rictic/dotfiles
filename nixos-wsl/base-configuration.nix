@@ -274,6 +274,14 @@ in
       LOG_LEVEL="''${LOG_LEVEL:-info}"
       
       echo "Debug: Root-owned dotfiles path: $DOTFILES_PATH"
+      echo "Debug: Source path for reference: $DOTFILES_SOURCE_PATH"
+      
+      # Handle transition from old configuration - if DOTFILES_PATH is still pointing to rictic's home
+      if [ "$DOTFILES_PATH" = "/home/rictic/open/dotfiles" ]; then
+        echo "Warning: Still using old configuration, forcing use of /etc/dotfiles"
+        DOTFILES_PATH="/etc/dotfiles"
+      fi
+      
       
       # Initialize or update the root-owned repository
       if [ ! -d "$DOTFILES_PATH" ]; then

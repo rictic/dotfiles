@@ -2,6 +2,7 @@
 { config, pkgs, lib, ... }:
 
 let
+  # Import shared packages - these will be passed from the flake
   commonSystemPackages = import ../shared/common-system-packages.nix { inherit pkgs; };
 in
 {

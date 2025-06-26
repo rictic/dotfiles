@@ -31,6 +31,9 @@ in
     # Add steam-run for FHS compatibility (useful for running non-Nix binaries)
     pkgs.steam-run
     
+    # Simple HTTP server for demonstration
+    pkgs.python3
+    
     # Dotfiles auto-update management script
     (pkgs.writeShellScriptBin "dotfiles-auto-update-ctl" ''
       #!/bin/bash
@@ -366,4 +369,40 @@ in
   # on your system were taken. It's perfectly fine and recommended to leave
   # this value at the release version of the first install of this system.
   system.stateVersion = "24.11";
+
+  # Simple HTTP server service for demonstration
+  systemd.services.hello-server = {
+    description = "Simple HTTP server saying hello from hostname";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+    
+    serviceConfig = {
+      Type = "simple";
+      User = "rictic";
+      WorkingDirectory = "/home/rictic";
+      ExecStart = "${pkgs.python3}/bin/python3 -c \"
+import http.server
+import socketserver
+import socket
+
+class HelloHandler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        hostname = socket.gethostname()
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        self.wfile.write(f'Hello from {hostname}!\\n'.encode())
+    
+    def log_message(self, format, *args):
+        pass  # Suppress default logging
+
+PORT = 9876
+with socketserver.TCPServer(('', PORT), HelloHandler) as httpd:
+    print(f'Serving at port {PORT}')
+    httpd.serve_forever()
+\"";
+      Restart = "always";
+      RestartSec = "5";
+    };
+  };
 }

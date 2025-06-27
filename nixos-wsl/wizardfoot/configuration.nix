@@ -42,6 +42,17 @@
     };
   };
 
+  systemd.services.caddy = {
+    serviceConfig = {
+      # Restart on failure
+      Restart = "on-failure";
+      RestartSec = "10s";
+      # Don't restart too frequently
+      StartLimitInterval = "60s";
+      StartLimitBurst = "3";
+    };
+  };
+
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [

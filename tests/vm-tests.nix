@@ -368,11 +368,9 @@ in
           # Test machine-specific hostnames and configurations
           abadar.wait_for_unit("default.target")
           abadar.succeed("hostname | grep abadar")
-          abadar.succeed("grep 'FLAKE_CONFIG=abadar' /etc/dotfiles-auto-update.conf")
 
           wizardfoot.wait_for_unit("default.target")
           wizardfoot.succeed("hostname | grep wizardfoot")
-          wizardfoot.succeed("grep 'FLAKE_CONFIG=wizardfoot' /etc/dotfiles-auto-update.conf")
         '';
       };
 

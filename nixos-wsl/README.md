@@ -9,8 +9,13 @@ This directory contains configurations for multiple WSL NixOS machines. Each mac
 
 ## Quick Start
 
-1. Install NixOS-WSL following the [official guide](https://github.com/nix-community/NixOS-WSL)
-2. Inside the new NixOS distro, run:
+1. Write the following to ~/.wslconfig in Windows.
+```toml
+[wsl2]
+networkingMode=mirrored
+```
+2. Install NixOS-WSL following the [official guide](https://github.com/nix-community/NixOS-WSL)
+3. Inside the new NixOS distro, run:
 
 ```bash
 git clone https://github.com/rictic/dotfiles
@@ -23,19 +28,11 @@ exit
 This should drop you back into your windows shell, where you should run:
 
 ```powershell
+Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -DefaultInboundAction Allow
+
 wsl --shutdown
 wsl
 ```
-
-## Additional manual steps for wizardfoot
-
-wizardfoot also runs caddy, which is the public web presence for the network, and so needs some extra steps at the windows level. Run this in an admin powershell:
-
-```powershell
-Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -DefaultInboundAction Allow
-```
-
-And 
 
 ## Making changes
 

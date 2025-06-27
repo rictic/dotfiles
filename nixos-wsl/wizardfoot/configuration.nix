@@ -30,5 +30,33 @@
   # Machine-specific packages (if any)
   environment.systemPackages = with pkgs; [
     # Add any wizardfoot-specific packages here
+    caddy
   ];
+
+  # Caddy reverse proxy configuration
+  services.caddy = {
+    enable = true;
+    virtualHosts = {
+      "pf.rictic.com" = {
+        extraConfig = ''
+          reverse_proxy localhost:30000 {
+            header_up X-Forwarded-For {remote_host}
+          }
+        '';
+      };
+      "stoot.rictic.com" = {
+        extraConfig = ''
+          handle_path /f0761029-433c-4cd6-bba3-5170bd8ea4a1/* {
+            reverse_proxy 192.168.86.38:8188
+          }
+        '';
+      };
+    };
+  };
+
+  # Open firewall ports for Caddy
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 80 443 ];
+  };
 }

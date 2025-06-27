@@ -27,6 +27,16 @@ wsl --shutdown
 wsl
 ```
 
+## Additional manual steps for wizardfoot
+
+wizardfoot also runs caddy, which is the public web presence for the network, and so needs some extra steps at the windows level. Run this in an admin powershell:
+
+```powershell
+Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -DefaultInboundAction Allow
+```
+
+And 
+
 ## Making changes
 
 ### Machine-specific changes:

@@ -83,14 +83,14 @@ fi
 
 # Test build
 echo "Testing build..."
-if ! nixos-rebuild dry-build --flake ".#$FLAKE_CONFIG"; then
+if ! nixos-rebuild dry-build --flake "."; then
   echo "Build test failed, not applying changes."
   exit 1
 fi
 
 # Apply the configuration
 echo "Applying new configuration..."
-if ! nixos-rebuild switch --flake ".#$FLAKE_CONFIG"; then
+if ! nixos-rebuild switch --flake "."; then
   echo "Switch failed. Changes likely not applied."
   exit 1
 fi

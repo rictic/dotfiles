@@ -17,6 +17,8 @@ in
     defaultUser = "rictic";
     startMenuLaunchers = true;
 
+    useWindowsDriver = true;
+
     # Enable integration with Windows
     wslConf.automount.root = "/mnt";
     wslConf.interop.appendWindowsPath = false;

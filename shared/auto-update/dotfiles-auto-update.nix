@@ -25,7 +25,7 @@ let
 
   # Get the git revision of the dotfiles repo from flake inputs
   # Fail if inputs aren't properly configured rather than hiding the problem
-  dotfilesGitRev = 
+  dotfilesGitRev =
     if !(inputs ? self) then
       builtins.throw "inputs.self is missing - ensure specialArgs = { inherit inputs; } is set in your flake configuration"
     else if !(inputs.self ? rev) then
@@ -150,6 +150,8 @@ in
         # Restart on failure after 1 minute
         Restart = "on-failure";
         RestartSec = "60";
+        # Kill the service if it runs longer than 20 minutes
+        TimeoutSec = "20min";
       };
     };
 

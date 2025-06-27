@@ -1,5 +1,5 @@
 # NixOS system configuration for wizardfoot (WSL)
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
   imports = [
@@ -46,9 +46,9 @@
     serviceConfig = {
       # Restart on failure
       Restart = "on-failure";
-      RestartSec = "10s";
+      RestartSec = lib.mkForce "10s";
       # Don't restart too frequently
-      StartLimitInterval = "60s";
+      StartLimitIntervalSec = "60s";
       StartLimitBurst = "3";
     };
   };

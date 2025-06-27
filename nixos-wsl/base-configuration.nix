@@ -157,6 +157,7 @@ in
   services.dotfiles-auto-update = {
     enable = true;
     enableHelloServer = true; # Enable the demo server
+    interval = "30s"; # Run every 30 seconds
     # All other options use defaults but can be customized here
   };
 

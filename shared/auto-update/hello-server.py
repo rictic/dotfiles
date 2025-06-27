@@ -20,5 +20,6 @@ class HelloHandler(http.server.BaseHTTPRequestHandler):
 
 PORT = 9876
 with socketserver.TCPServer(("0.0.0.0", PORT), HelloHandler) as httpd:
+    httpd.allow_reuse_address = True
     print(f"Serving at port {PORT}")
     httpd.serve_forever()

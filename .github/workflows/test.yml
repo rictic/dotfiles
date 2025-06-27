@@ -1,0 +1,96 @@
+name: Test Dotfiles Configuration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  vm-tests:
+    name: VM Tests
+    runs-on: ubuntu-latest
+
+    # Increase timeout for VM tests
+    timeout-minutes: 60
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Nix
+      uses: DeterminateSystems/nix-installer-action@main
+      with:
+        extra-conf: |
+          experimental-features = nix-command flakes
+
+    - name: Setup Nix cache
+      uses: DeterminateSystems/magic-nix-cache-action@main
+
+    - name: Check flake
+      run: nix flake check --show-trace
+
+    - name: Run basic system test
+      run: nix build .#checks.x86_64-linux.basic-system-test --show-trace
+
+    - name: Run home-manager test
+      run: nix build .#checks.x86_64-linux.home-manager-test --show-trace
+
+    - name: Run auto-update test
+      run: nix build .#checks.x86_64-linux.auto-update-test --show-trace
+
+    - name: Run machine-specific test
+      run: nix build .#checks.x86_64-linux.machine-specific-test --show-trace
+
+  build-configurations:
+    name: Build Configurations
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        config:
+          - abadar
+          - wizardfoot
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Nix
+      uses: DeterminateSystems/nix-installer-action@main
+      with:
+        extra-conf: |
+          experimental-features = nix-command flakes
+
+    - name: Setup Nix cache
+      uses: DeterminateSystems/magic-nix-cache-action@main
+
+    - name: Build NixOS configuration
+      run: nix build .#nixosConfigurations.${{ matrix.config }}.config.system.build.toplevel --show-trace
+
+  # Separate job for macOS configuration (if running on macOS runners)
+  build-darwin:
+    name: Build Darwin Configuration
+    runs-on: macos-14  # Use macOS runner for darwin builds
+    timeout-minutes: 30
+    strategy:
+    matrix:
+      config:
+        - reepicheep
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Nix
+      uses: DeterminateSystems/nix-installer-action@main
+      with:
+        extra-conf: |
+          experimental-features = nix-command flakes
+
+    - name: Setup Nix cache
+      uses: DeterminateSystems/magic-nix-cache-action@main
+
+    - name: Build Darwin configuration
+      run: nix build .#darwinConfigurations.${{ matrix.config }} --show-trace

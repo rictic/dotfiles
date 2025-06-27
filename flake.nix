@@ -28,6 +28,11 @@
     let
       # Import shared configurations
       claude-overlay = import ./shared/claude-overlay.nix;
+      
+      # Import VM tests
+      vmTests = import ./tests/vm-tests.nix {
+        inherit nixpkgs nixos-wsl home-manager nix-darwin inputs;
+      };
     in
     {
       # macOS configuration
@@ -60,6 +65,10 @@
           ./nixos-wsl/abadar/configuration.nix
           home-manager.nixosModules.home-manager
           {
+            # Allow unfree packages at the system level
+            nixpkgs.config.allowUnfree = true;
+            nixpkgs.overlays = [ claude-overlay ];
+            
             home-manager.useGlobalPkgs = false;
             home-manager.useUserPackages = true;
             home-manager.users.rictic = import ./shared/home-nixos.nix;
@@ -81,6 +90,10 @@
           ./nixos-wsl/wizardfoot/configuration.nix
           home-manager.nixosModules.home-manager
           {
+            # Allow unfree packages at the system level
+            nixpkgs.config.allowUnfree = true;
+            nixpkgs.overlays = [ claude-overlay ];
+            
             home-manager.useGlobalPkgs = false;
             home-manager.useUserPackages = true;
             home-manager.users.rictic = import ./shared/home-nixos.nix;
@@ -95,5 +108,10 @@
         ];
       };
 
+      # VM Tests output for manual access
+      inherit vmTests;
+
+      # Test checks for nix flake check
+      checks.x86_64-linux = vmTests.integration-tests;
     };
 }

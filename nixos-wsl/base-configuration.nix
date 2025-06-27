@@ -11,9 +11,6 @@ in
     ../shared/auto-update/dotfiles-auto-update.nix
   ];
 
-  # Allow unfree packages (needed for some packages like steam-run)
-  nixpkgs.config.allowUnfree = true;
-
   # WSL-specific settings
   wsl = {
     enable = true;

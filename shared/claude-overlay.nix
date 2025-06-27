@@ -1,7 +1,7 @@
 # Claude Code overlay shared between nix-darwin and NixOS
 # This creates a custom package for claude-code that can be used on both platforms
 final: prev: {
-  claude-code-latest = prev.stdenv.mkDerivation rec {
+  claude-code-latest = if prev.config.allowUnfree or false then prev.stdenv.mkDerivation rec {
     pname = "@anthropic-ai/claude-code";
     version = "1.0.25";
 
@@ -50,5 +50,16 @@ final: prev: {
       license = licenses.unfree;
       platforms = platforms.unix;
     };
-  };
+  } else prev.writeScriptBin "claude-code-latest" ''
+    #!${prev.stdenv.shell}
+    echo "claude-code-latest is not available (unfree packages not allowed)"
+    exit 1
+  '';
+
+  # Also provide claude as a direct alias to claude-code-latest
+  claude = if prev.config.allowUnfree or false then final.claude-code-latest else prev.writeScriptBin "claude" ''
+    #!${prev.stdenv.shell}
+    echo "claude is not available (unfree packages not allowed)"
+    exit 1
+  '';
 }

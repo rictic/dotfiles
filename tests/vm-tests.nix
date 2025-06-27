@@ -43,6 +43,7 @@ in
     in
     pkgsWithUnfree.lib.nixosSystem {
       system = "x86_64-linux";
+      specialArgs = { inherit inputs; };
       modules = [
         # Use the actual configuration but with test modifications
         nixos-wsl.nixosModules.wsl
@@ -96,6 +97,7 @@ in
     in
     pkgsWithUnfree.lib.nixosSystem {
       system = "x86_64-linux";
+      specialArgs = { inherit inputs; };
       modules = [
         nixos-wsl.nixosModules.wsl
         ../nixos-wsl/wizardfoot/configuration.nix
@@ -151,6 +153,8 @@ in
         nodes.machine =
           { config, pkgs, ... }:
           {
+            _module.args = { inherit inputs; };
+
             imports = [
               nixos-wsl.nixosModules.wsl
               ../nixos-wsl/base-configuration.nix
@@ -239,6 +243,8 @@ in
         nodes.machine =
           { config, pkgs, ... }:
           {
+            _module.args = { inherit inputs; };
+
             imports = [
               nixos-wsl.nixosModules.wsl
               ../nixos-wsl/base-configuration.nix
@@ -307,6 +313,8 @@ in
           abadar =
             { config, pkgs, ... }:
             {
+              _module.args = { inherit inputs; };
+
               imports = [
                 nixos-wsl.nixosModules.wsl
                 ../nixos-wsl/abadar/configuration.nix
@@ -332,6 +340,7 @@ in
           wizardfoot =
             { config, pkgs, ... }:
             {
+              _module.args = { inherit inputs; };
               imports = [
                 nixos-wsl.nixosModules.wsl
                 ../nixos-wsl/wizardfoot/configuration.nix
@@ -382,6 +391,8 @@ in
         nodes.machine =
           { config, pkgs, ... }:
           {
+            _module.args = { inherit inputs; };
+
             imports = [
               nixos-wsl.nixosModules.wsl
               ../nixos-wsl/base-configuration.nix

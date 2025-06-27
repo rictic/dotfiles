@@ -28,16 +28,23 @@
     let
       # Import shared configurations
       claude-overlay = import ./shared/claude-overlay.nix;
-      
+
       # Import VM tests
       vmTests = import ./tests/vm-tests.nix {
-        inherit nixpkgs nixos-wsl home-manager nix-darwin inputs;
+        inherit
+          nixpkgs
+          nixos-wsl
+          home-manager
+          nix-darwin
+          inputs
+          ;
       };
     in
     {
       # macOS configuration
       darwinConfigurations.reepicheep = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
+        specialArgs = { inherit inputs; };
         modules = [
           ./nix-darwin/configuration.nix
           { nixpkgs.overlays = [ claude-overlay ]; }
@@ -60,6 +67,7 @@
       # NixOS WSL configurations
       nixosConfigurations.abadar = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
         modules = [
           nixos-wsl.nixosModules.wsl
           ./nixos-wsl/abadar/configuration.nix
@@ -68,7 +76,7 @@
             # Allow unfree packages at the system level
             nixpkgs.config.allowUnfree = true;
             nixpkgs.overlays = [ claude-overlay ];
-            
+
             home-manager.useGlobalPkgs = false;
             home-manager.useUserPackages = true;
             home-manager.users.rictic = import ./shared/home-nixos.nix;
@@ -85,6 +93,7 @@
 
       nixosConfigurations.wizardfoot = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
         modules = [
           nixos-wsl.nixosModules.wsl
           ./nixos-wsl/wizardfoot/configuration.nix
@@ -93,7 +102,7 @@
             # Allow unfree packages at the system level
             nixpkgs.config.allowUnfree = true;
             nixpkgs.overlays = [ claude-overlay ];
-            
+
             home-manager.useGlobalPkgs = false;
             home-manager.useUserPackages = true;
             home-manager.users.rictic = import ./shared/home-nixos.nix;

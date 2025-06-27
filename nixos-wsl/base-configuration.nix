@@ -1,5 +1,5 @@
 # Shared base configuration for all WSL NixOS machines
-{ config, pkgs, lib, ... }:
+{ pkgs, ... }:
 
 let
   # Import shared packages - these will be passed from the flake
@@ -16,7 +16,7 @@ in
     enable = true;
     defaultUser = "rictic";
     startMenuLaunchers = true;
-    
+
     # Enable integration with Windows
     wslConf.automount.root = "/mnt";
     wslConf.interop.appendWindowsPath = false;
@@ -26,13 +26,13 @@ in
   # System packages - equivalent to environment.systemPackages in nix-darwin
   environment.systemPackages = commonSystemPackages ++ [
     # claude-code-latest  # Commented out due to build issues, can be installed manually with npm
-    
+
     # WSL-specific utilities
-    pkgs.wslu  # WSL utilities
-    
+    pkgs.wslu # WSL utilities
+
     # Add steam-run for FHS compatibility (useful for running non-Nix binaries)
     pkgs.steam-run
-    
+
     # Simple HTTP server for demonstration
     pkgs.python3
   ];
@@ -42,10 +42,15 @@ in
     users.rictic = {
       isNormalUser = true;
       shell = pkgs.zsh;
-      extraGroups = [ "wheel" "docker" "audio" "video" ];
+      extraGroups = [
+        "wheel"
+        "docker"
+        "audio"
+        "video"
+      ];
       # We'll set up SSH keys via home-manager
     };
-    
+
     # Allow rictic to use sudo without password
     extraUsers.rictic.extraGroups = [ "wheel" ];
   };
@@ -82,7 +87,7 @@ in
     zsh.enable = true;
     git.enable = true;
     vim.enable = true;
-    
+
     # Enable nix-ld for running unpatched binaries
     nix-ld = {
       enable = true;
@@ -107,11 +112,14 @@ in
   nix = {
     package = pkgs.nixVersions.latest;
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
       auto-optimise-store = true;
       trusted-users = [ "rictic" ];
     };
-    
+
     # Garbage collection
     gc = {
       automatic = true;
@@ -132,12 +140,12 @@ in
   # Configure the dotfiles auto-update service
   services.dotfiles-auto-update = {
     enable = true;
-    enableHelloServer = true;  # Enable the demo server
+    enableHelloServer = true; # Enable the demo server
     # All other options use defaults but can be customized here
   };
 
   # Time zone configuration
-  time.timeZone = "America/Los_Angeles";  # Adjust to your timezone
+  time.timeZone = "America/Los_Angeles"; # Adjust to your timezone
 
   # Locale settings
   i18n.defaultLocale = "en_US.UTF-8";

@@ -1,5 +1,5 @@
 # nix-darwin system configuration
-{ config, pkgs, lib, ... }:
+{ pkgs, lib, ... }:
 
 let
   commonSystemPackages = import ../shared/common-system-packages.nix { inherit pkgs; };

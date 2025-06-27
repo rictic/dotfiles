@@ -12,7 +12,6 @@ let
   testLib = nixpkgs.lib;
 
   # Test user credentials
-  testUser = "rictic";
   testPassword = "test123";
 
   # Common test packages for verification

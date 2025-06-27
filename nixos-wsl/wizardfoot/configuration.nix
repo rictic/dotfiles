@@ -50,27 +50,4 @@
       22 # SSH
     ];
   };
-
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-      PermitRootLogin = "no";
-      PubkeyAuthentication = true;
-      AuthenticationMethods = "publickey";
-      AllowUsers = [ "rictic" ];
-    };
-  };
-
-  users.users.rictic = {
-    isNormalUser = true;
-    extraGroups = [
-      "wheel"
-      "sudo"
-    ];
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH4XhLvnDXQ815nB6fqCIWZ6sV2SY5eUavWAhScLP4Qh rictic@gmail.com"
-    ];
-  };
 }

@@ -53,6 +53,15 @@
     };
   };
 
+  services.forgejo = {
+    enable = true;
+    database.type = "sqlite3";
+    settings = {
+      server.DOMAIN = "git.yourdomain.local";
+      server.HTTP_PORT = 7272;
+    };
+  };
+
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [

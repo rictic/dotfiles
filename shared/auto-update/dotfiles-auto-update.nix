@@ -79,7 +79,7 @@ in
 
     remote = mkOption {
       type = types.str;
-      default = "https://github.com/rictic/dotfiles.git";
+      default = "http://100.121.92.23:7272/rictic/dotfiles.git";
       description = "Git remote URL for the dotfiles repository";
     };
 

@@ -59,6 +59,8 @@
     settings = {
       server.DOMAIN = "git.yourdomain.local";
       server.HTTP_PORT = 7272;
+      # We don't need any additional users.
+      service.DISABLE_REGISTRATION = true;
     };
   };
 
